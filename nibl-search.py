@@ -10,6 +10,10 @@ __module_version__ = '1.0'
 __module_description__ = 'Searches NIBL bots for the query and returns results, for easy searching.'
 
 tabName = '(NIBL-Search)'
+channelName = '#nibl'
+helpUsage = '''Usage: NIBL search <search query>
+       NIBL get <index>
+'''
 
 class AppURLopener(urllib.FancyURLopener):
     version = 'nibl-search/1.0'
@@ -97,10 +101,10 @@ def download(word, word_eol, userdata):
     itemToGet = lastSearch[indexToGet]
     commandString = 'MSG {} xdcc send {}'.format(itemToGet['botName'], itemToGet['botPack'])
     tabContext.emit_print('Generic Message', 'GET', 'GETting \035\00307{}\017'.format(itemToGet['filename']))
-    niblContext = hexchat.find_context(channel='#nibl')
+    niblContext = hexchat.find_context(channel=channelName)
     if niblContext is None:
-        hexchat.command('JOIN {}'.format(channel='#nibl'))
-        niblContext = hexchat.find_context(channel='#nibl')
+        hexchat.command('JOIN {}'.format(channel=channelName))
+        niblContext = hexchat.find_context(channel=channelName)
     niblContext.command(commandString)
     return
 
@@ -113,4 +117,4 @@ def main(word, word_eol, userdata):
         download(word, word_eol, userdata)
     return hexchat.EAT_ALL
 
-hexchat.hook_command('NIBL', main, help='/NIBL <search query>')
+hexchat.hook_command('NIBL', main, help=helpUsage)
