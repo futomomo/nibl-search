@@ -1,5 +1,4 @@
 #!/usr/bin/env py -2
-import sys
 import urllib
 import xml.dom.minidom
 import hexchat
