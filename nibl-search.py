@@ -101,11 +101,7 @@ def download(word, word_eol, userdata):
     itemToGet = lastSearch[indexToGet]
     commandString = 'MSG {} xdcc send {}'.format(itemToGet['botName'], itemToGet['botPack'])
     tabContext.emit_print('Generic Message', 'GET', 'GETting \035\00307{}\017'.format(itemToGet['filename']))
-    niblContext = hexchat.find_context(channel=channelName)
-    if niblContext is None:
-        hexchat.command('JOIN {}'.format(channel=channelName))
-        niblContext = hexchat.find_context(channel=channelName)
-    niblContext.command(commandString)
+    tabContext.command(commandString)
     return
 
 def main(word, word_eol, userdata):
