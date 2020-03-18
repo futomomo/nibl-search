@@ -26,7 +26,7 @@ def updateBotList():
     botUrl = 'https://api.nibl.co.uk/nibl/bots'
     stringResult = ''
     try:
-        fileObj = urllib.urlopen(finalUrl)
+        fileObj = urllib.urlopen(botUrl)
         # print('The HTTP status code was: ' + str(fileObj.getcode()))
         if fileObj.getcode() != 200:
             fileObj.close()
@@ -79,6 +79,7 @@ def search(word, word_eol, userdata):
         return
     jsonResult = json.loads(stringResult)['content']
     lastSearch = jsonResult[:]
+    stringResult = None
     tabContext = hexchat.find_context(channel=tabName)
     if tabContext is None:
         hexchat.command('QUERY {}'.format(tabName))
@@ -118,7 +119,11 @@ def download(word, word_eol, userdata):
     itemToGet = lastSearch[indexToGet]
     commandString = 'MSG {} xdcc send {}'.format(botList[str(itemToGet['botId'])], itemToGet['number'])
     tabContext.emit_print('Generic Message', 'GET', 'GETting \035\00307{}\017'.format(itemToGet['name']))
-    tabContext.command(commandString)
+    niblContext = hexchat.find_context(channel=channelName)
+    if tabContext is None:
+        hexchat.command('QUERY {}'.format(channelName))
+        niblContext = hexchat.find_context(channel=channelName)
+    niblContext.command(commandString)
     return
 
 def main(word, word_eol, userdata):
