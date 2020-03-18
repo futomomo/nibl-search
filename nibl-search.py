@@ -110,9 +110,9 @@ def download(word, word_eol, userdata):
     if tabContext is None:
         hexchat.command('QUERY {}'.format(tabName))
         tabContext = hexchat.find_context(channel=tabName)
-    niblContext = hexchat.find_context(channel=channelName)
-    if niblContext is None:
-        tabContext.emit_print('Generic Message', 'GET', '\002\00304ERROR: You need to be in #nibl to be able to download via XDCC!\017')
+    if hexchat.find_context(channel=channelName) is None:
+        hexchat.command('JOIN {}'.format(channelName))
+        tabContext.emit_print('Generic Message', 'GET', '\002\00304ERROR: You need to be in #nibl to be able to download via XDCC!\nYou should have been automatically joined but you need to rerun the command to start downloading!\017')
         return
     if len(lastSearch) == 0:
         tabContext.emit_print('Generic Message', 'GET', '\002\00304ERROR: Last search result is empty, please make a search with results over 0 first!\017')
