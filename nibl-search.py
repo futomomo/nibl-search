@@ -77,7 +77,10 @@ def search(word, word_eol, userdata):
     except IOError:
         print('IOError: unable to make a connection to url')
         return
+    # limit max results to 500, as there is some problem formatting the string when items reach several hundreds, for some reason
     jsonResult = json.loads(stringResult)['content']
+    resultLen = len(jsonResult)
+    jsonResult = jsonResult[:500]
     lastSearch = jsonResult[:]
     stringResult = None
     tabContext = hexchat.find_context(channel=tabName)
@@ -85,25 +88,32 @@ def search(word, word_eol, userdata):
         hexchat.command('QUERY {}'.format(tabName))
         tabContext = hexchat.find_context(channel=tabName)
 
-    tabContext.emit_print('Generic Message', 'SEARCH', 'Query \'' + searchQuery + '\'\nFound ' + str(len(jsonResult)) + ' results')
+    tabContext.emit_print('Generic Message', 'SEARCH', 'Query \'{}\'\nFound {} ({}) results.'.format(searchQuery, len(jsonResult), resultLen))
     outString = ''
     for i,item in enumerate(jsonResult):
         itemString = '{}. \035\00307{}\017 \002----\017 \00311/msg {} xdcc send {}\017\n'.format(i+1, item['name'], botList[str(item['botId'])], item['number'])
         if len(outString) + len(itemString) > 2000:
-            tabContext.emit_print('Generic Message', '', outString.rstrip())
+            tabContext.emit_print('Generic Message', '>>', outString.rstrip())
             outString = itemString
         else:
             outString += itemString
-    if len(resultString) > 0:
-        tabContext.emit_print('Generic Message', '', outString.rstrip())
+    if len(outString) > 0:
+        tabContext.emit_print('Generic Message', '>>', outString.rstrip())
+    if resultLen > len(jsonResult):
+        tabContext.emit_print('Generic Message', 'SEARCH', 'Results have been limited to max, try adding keywords for more specific results.')
     return
 
 def download(word, word_eol, userdata):
     global lastSearch
+    global channelName
     tabContext = hexchat.find_context(channel=tabName)
     if tabContext is None:
         hexchat.command('QUERY {}'.format(tabName))
         tabContext = hexchat.find_context(channel=tabName)
+    niblContext = hexchat.find_context(channel=channelName)
+    if niblContext is None:
+        tabContext.emit_print('Generic Message', 'GET', '\002\00304ERROR: You need to be in #nibl to be able to download via XDCC!\017')
+        return
     if len(lastSearch) == 0:
         tabContext.emit_print('Generic Message', 'GET', '\002\00304ERROR: Last search result is empty, please make a search with results over 0 first!\017')
         return
@@ -119,11 +129,8 @@ def download(word, word_eol, userdata):
     itemToGet = lastSearch[indexToGet]
     commandString = 'MSG {} xdcc send {}'.format(botList[str(itemToGet['botId'])], itemToGet['number'])
     tabContext.emit_print('Generic Message', 'GET', 'GETting \035\00307{}\017'.format(itemToGet['name']))
-    niblContext = hexchat.find_context(channel=channelName)
-    if tabContext is None:
-        hexchat.command('QUERY {}'.format(channelName))
-        niblContext = hexchat.find_context(channel=channelName)
-    niblContext.command(commandString)
+
+    tabContext.command(commandString)
     return
 
 def main(word, word_eol, userdata):
