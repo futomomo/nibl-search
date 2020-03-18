@@ -21,7 +21,7 @@ class AppURLopener(urllib.FancyURLopener):
 
 urllib._urlopener = AppURLopener()
 
-def udateBotList():
+def updateBotList():
     global botList
     botUrl = 'https://api.nibl.co.uk/nibl/bots'
     stringResult = ''
@@ -129,5 +129,7 @@ def main(word, word_eol, userdata):
     elif word[1] == 'get':
         download(word, word_eol, userdata)
     return hexchat.EAT_ALL
+
+updateBotList()
 
 hexchat.hook_command('NIBL', main, help=helpUsage)
