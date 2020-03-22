@@ -1,4 +1,5 @@
 #!/usr/bin/env py -2
+# -*- coding: utf-8 -*-
 import urllib
 import json
 import hexchat
@@ -89,16 +90,16 @@ def search(word, word_eol, userdata):
         tabContext = hexchat.find_context(channel=tabName)
 
     tabContext.emit_print('Generic Message', 'SEARCH', 'Query \'{}\'\nFound {} ({}) results.'.format(searchQuery, len(jsonResult), resultLen))
-    outString = ''
+    outString = u''
     for i,item in enumerate(jsonResult):
-        itemString = '{}. \035\00307{}\017 \002----\017 \00311/msg {} xdcc send {}\017\n'.format(i+1, item['name'], botList[str(item['botId'])], item['number'])
-        if len(outString) + len(itemString) > 2000:
-            tabContext.emit_print('Generic Message', '>>', outString.rstrip())
+        itemString = u'{}. \035\00307{}\017 \002----\017 \00311/msg {} xdcc send {}\017\n'.format(i+1, item['name'], botList[str(item['botId'])], item['number'])
+        if len(outString) + len(itemString) > 3000:
+            tabContext.emit_print('Generic Message', '>>', outString.rstrip().encode('ascii', 'replace'))
             outString = itemString
         else:
             outString += itemString
     if len(outString) > 0:
-        tabContext.emit_print('Generic Message', '>>', outString.rstrip())
+        tabContext.emit_print('Generic Message', '>>', outString.rstrip().encode('ascii', 'replace'))
     if resultLen > len(jsonResult):
         tabContext.emit_print('Generic Message', 'SEARCH', 'Results have been limited to max, try adding keywords for more specific results.')
     return
